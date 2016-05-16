@@ -1,0 +1,56 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+    <div class="navbar" >
+        <ul class="nav navbar-nav" style="color: white; margin-top: 20px;">
+            <li>
+                <input style="background-color: red; margin: 5px; color: white; min-width: 100px; height: 50px"
+                       type="button" value="N/A" id="redBtn"/>
+            </li>
+            <li>
+                <input style="background-color: green; margin: 5px; color: white; min-width: 100px; height: 50px"
+                       type="button" value="N/A" id="greenBtn" />
+            </li>
+            <li>
+                <input style="background-color: blue; margin: 5px; color: white; min-width: 100px; height: 50px"
+                       type="button" value="N/A" id="blueBtn" />
+            </li>
+        </ul>
+    </div>
+
+@section scripts {
+    
+    <script src="~/js/jquery.signalr-2.1.0.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script>
+        $(function () {
+            
+            var connection = $.connection.ledHub;
+            connection.client.ledChangeFromServer = function (red,green,blue) {
+                document.getElementById('redBtn').value = red;
+                document.getElementById('greenBtn').value = green;
+                document.getElementById('blueBtn').value = blue;
+            };
+            $.connection.hub.start().done(function () {
+                $('#redBtn').click(function () {
+                    if (document.getElementById('redBtn').value == "on")
+                        connection.server.redSwitched("off");
+                    else connection.server.redSwitched("on");
+                });
+                $('#greenBtn').click(function () {
+                    if (document.getElementById('greenBtn').value == "on")
+                        connection.server.greenSwitched("off");
+                    else connection.server.greenSwitched("on");
+                });
+                $('#blueBtn').click(function () {
+                    if (document.getElementById('blueBtn').value == "on")
+                        connection.server.blueSwitched("off");
+                    else connection.server.blueSwitched("on");
+                });
+                connection.server.requestUpdate();
+            })
+
+        });
+    </script>
+}
